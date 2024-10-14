@@ -1,0 +1,77 @@
+# Contains the list of files and folders to ignore.
+
+# Ignores projects.
+#*.pjx
+#*.PJX
+#*.pjt
+#*.PJT
+
+# Ignores all compiled programs, forms, menus and classes.
+#*.scx
+#*.sct
+#*.SCX
+#*.SCT
+#*.mnt
+#*.MNT
+#*.mnx
+#*.MNX
+*.mpr
+*.MPR
+#*.vct
+#*.VCT
+#*.vcx
+#*.VCX
+*.fxp
+*.FXP
+
+# Ignores databases, tables, indexes.
+#*.dbf
+#*.DBF
+#*.cdx
+#*.CDX
+#*.dbc
+#*.DBC
+#*.dct
+#*.DCT
+#*.fpt
+#*.FPT
+#*.dcx
+#*.DCX
+#*.irt
+#*.IRT
+*.tbk
+*.TBK
+
+# Ignores reports.
+#*.frx
+#*.FRX
+#*.frt
+#*.FRT
+
+# Ignores temporary files.
+*.bak
+*.BAK
+
+# Various.
+#*.exe
+#*.EXE
+#*.app
+#*.APP
+*.ERR
+*.err
+#*.rar
+#*.RAR
+#*.zip
+#*.ZIP
+.DS_Store
+Thumbs.db
+#/IMG/Thumbs.db
+#*.DLL
+#*.dll
+
+tm*.*
+#test*.*
+#p*.*
+#*.dat
+#*.xml
+#*.json
