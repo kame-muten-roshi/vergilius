@@ -75,5 +75,4 @@ tm*.*
 #*.dat
 #*.xml
 #*.json
-*.h
-*.H
+facturasend.h
