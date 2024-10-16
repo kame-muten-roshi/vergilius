@@ -1,4 +1,5 @@
 # AMS Vergilius®
+System for administrative management of mechanical workshops.
 
 The client is a 32-bit Windows-based application written in Visual FoxPro 9.
 
