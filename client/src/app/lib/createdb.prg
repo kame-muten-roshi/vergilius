@@ -56,6 +56,7 @@ FUNCTION createdb
     DO _table('marcas1')
     DO _table('marcas2')
     DO _table('proceden')
+    DO proveedo_dbf
     DO _table('rubros1')
     DO _table('rubros2')
     DO unidad_dbf
@@ -68,6 +69,7 @@ FUNCTION createdb
     DO _index('marcas1')
     DO _index('marcas2')
     DO _index('proceden')
+    DO _index('proveedo')
     DO _index('rubros1')
     DO _index('rubros2')
     DO _index('unidad')
@@ -266,6 +268,7 @@ FUNCTION table_exists
 * ciudades_dbf() : boolean
 * depar_dbf() : boolean
 * familias_dbf() : boolean
+* proveedo_dbf() : boolean
 * unidad_dbf() : boolean
 */
 
@@ -369,6 +372,68 @@ FUNCTION familias_dbf
         p4 N(6,2), ;
         p5 N(6,2), ;
         vigente L(1), ;
+        id_local N(2) ;
+    )
+    USE
+*ENDFUNC
+
+**/
+* Creates table 'proveedo'.
+*
+* @return boolean
+* proveedo_dbf returns true (.T.) if it can create the table; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION proveedo_dbf
+    PRIVATE pcTableName
+    pcTableName = 'proveedo'
+
+    IF table_exists(pcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    CREATE TABLE (pcTableName) ( ;
+        codigo N(5), ;
+        nombre C(40), ;
+        direc1 C(60), ;
+        direc2 C(60), ;
+        ciudad C(25), ;
+        telefono C(40), ;
+        fax C(25), ;
+        e_mail C(60), ;
+        ruc C(15), ;
+        dias_plazo N(3), ;
+        dueno C(40), ;
+        teldueno C(25), ;
+        gtegral C(40), ;
+        telgg C(25), ;
+        gteventas C(40), ;
+        telgv C(25), ;
+        gtemkg C(40), ;
+        telgm C(25), ;
+        stecnico C(40), ;
+        stdirec1 C(60), ;
+        stdirec2 C(60), ;
+        sttel C(25), ;
+        sthablar1 C(60), ;
+        vendedor1 C(40), ;
+        larti1 C(25), ;
+        tvend1 C(25), ;
+        vendedor2 C(40), ;
+        larti2 C(25), ;
+        tvend2 C(25), ;
+        vendedor3 C(40), ;
+        larti3 C(25), ;
+        tvend3 C(25), ;
+        vendedor4 C(40), ;
+        larti4 C(25), ;
+        tvend4 C(25), ;
+        vendedor5 C(40), ;
+        larti5 C(25), ;
+        tvend5 C(25), ;
+        saldo_actu N(12), ;
+        saldo_usd N(12,2), ;
+        vigente C(1), ;
         id_local N(2) ;
     )
     USE
