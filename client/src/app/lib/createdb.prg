@@ -49,6 +49,8 @@ FUNCTION createdb
     SET DEFAULT TO (tcPath)
 
     * DBF.
+    DO barrios_dbf
+    DO ciudades_dbf
     DO depar_dbf
     DO familias_dbf
     DO _table('marcas1')
@@ -57,6 +59,8 @@ FUNCTION createdb
     DO _table('rubros2')
 
     * CDX.
+    DO _index('barrios')
+    DO _index('ciudades')
     DO _index('depar')
     DO _index('familias')
     DO _index('marcas1')
@@ -254,9 +258,63 @@ FUNCTION table_exists
 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 **/
+* barrios_dbf() : boolean
+* ciudades_dbf() : boolean
 * depar_dbf() : boolean
 * familias_dbf() : boolean
 */
+
+**/
+* Creates table 'barrios'.
+*
+* @return boolean
+* barrios_dbf returns true (.T.) if it can create the table; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION barrios_dbf
+    PRIVATE pcTableName
+    pcTableName = 'barrios'
+
+    IF table_exists(pcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    CREATE TABLE (pcTableName) ( ;
+        codigo N(5), ;
+        nombre C(30), ;
+        departamen N(3), ;
+        ciudad N(5), ;
+        vigente L(1), ;
+        id_local N(2) ;
+    )
+    USE
+*ENDFUNC
+
+**/
+* Creates table 'ciudades'.
+*
+* @return boolean
+* ciudades_dbf returns true (.T.) if it can create the table; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION ciudades_dbf
+    PRIVATE pcTableName
+    pcTableName = 'ciudades'
+
+    IF table_exists(pcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    CREATE TABLE (pcTableName) ( ;
+        codigo N(5), ;
+        nombre C(30), ;
+        departamen N(3), ;
+        vigente L(1), ;
+        id_local N(2), ;
+        sifen N(5) ;
+    )
+    USE
+*ENDFUNC
 
 **/
 * Creates table 'depar'.
@@ -286,7 +344,7 @@ FUNCTION depar_dbf
 * Creates table 'familias'.
 *
 * @return boolean
-* depar_dbf returns true (.T.) if it can create the table; otherwise, it
+* familias_dbf returns true (.T.) if it can create the table; otherwise, it
 * returns false (.F.).
 */
 FUNCTION familias_dbf
