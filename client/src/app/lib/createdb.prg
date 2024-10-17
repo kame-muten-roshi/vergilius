@@ -55,8 +55,10 @@ FUNCTION createdb
     DO familias_dbf
     DO _table('marcas1')
     DO _table('marcas2')
+    DO _table('proceden')
     DO _table('rubros1')
     DO _table('rubros2')
+    DO unidad_dbf
 
     * CDX.
     DO _index('barrios')
@@ -65,8 +67,10 @@ FUNCTION createdb
     DO _index('familias')
     DO _index('marcas1')
     DO _index('marcas2')
+    DO _index('proceden')
     DO _index('rubros1')
     DO _index('rubros2')
+    DO _index('unidad')
 
     SET DEFAULT TO (pcCurDir)
 * ENDFUNC
@@ -262,6 +266,7 @@ FUNCTION table_exists
 * ciudades_dbf() : boolean
 * depar_dbf() : boolean
 * familias_dbf() : boolean
+* unidad_dbf() : boolean
 */
 
 **/
@@ -363,6 +368,32 @@ FUNCTION familias_dbf
         p3 N(6,2), ;
         p4 N(6,2), ;
         p5 N(6,2), ;
+        vigente L(1), ;
+        id_local N(2) ;
+    )
+    USE
+*ENDFUNC
+
+**/
+* Creates table 'unidad'.
+*
+* @return boolean
+* unidad_dbf returns true (.T.) if it can create the table; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION unidad_dbf
+    PRIVATE pcTableName
+    pcTableName = 'unidad'
+
+    IF table_exists(pcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    CREATE TABLE (pcTableName) ( ;
+        codigo N(4), ;
+        nombre C(30), ;
+        simbolo C(5), ;
+        divisible L(1), ;
         vigente L(1), ;
         id_local N(2) ;
     )
