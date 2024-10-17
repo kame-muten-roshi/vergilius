@@ -27,7 +27,6 @@
 * @return boolean
 * true if no error has occurred and false otherwise.
 */
-
 FUNCTION createdb
     PARAMETERS tcPath
 
@@ -39,7 +38,7 @@ FUNCTION createdb
     tcPath = ALLTRIM(tcPath)
     tcPath = IIF(RIGHT(tcPath, 1) != '\', tcPath + '\', tcPath)
 
-    IF !_directory() THEN
+    IF !_directory(tcPath) THEN
         RETURN .F.
     ENDIF
     * end { parameter validations }
@@ -50,27 +49,61 @@ FUNCTION createdb
     SET DEFAULT TO (tcPath)
 
     * DBF.
+    DO depar_dbf
     DO familias_dbf
-    DO marcas1_dbf
-    DO marcas2_dbf
+    DO _table('marcas1')
+    DO _table('marcas2')
+    DO _table('rubros1')
+    DO _table('rubros2')
 
     * CDX.
+    DO _index('depar')
     DO _index('familias')
     DO _index('marcas1')
     DO _index('marcas2')
+    DO _index('rubros1')
+    DO _index('rubros2')
 
     SET DEFAULT TO (pcCurDir)
 * ENDFUNC
 
+**/ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+*                              FUNCTION SECTION                              *
+* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+**/
+* _directory(tcDirectoryName) : boolean
+* _index(tcTableName) : boolean
+* _table(tcTableName) : boolean
+* file_status(tcFileName) : integer
+* table_exists(tcTableName) : boolean
+*/
+
 **/
 * Locates the specified directory.
+*
+* @param string tcDirectoryName
+* Specifies the name of the directory to locate.
 *
 * @return boolean
 * _directory() returns true (.T.) if the specified directory is found on the
 * disk; otherwise, it returns false (.F.).
 */
 FUNCTION _directory
-    pnFileHandle = FCREATE(tcPath + 'tm.tmp')
+    PARAMETERS tcDirectoryName
+
+    * begin { parameter validations }
+    IF PARAMETERS() < 1 THEN
+        RETURN .F.
+    ENDIF
+
+    IF TYPE('tcDirectoryName') != 'C' OR EMPTY(tcDirectoryName) THEN
+        RETURN .F.
+    ENDIF
+    * end { parameter validations }
+
+    PRIVATE pnFileHandle
+    pnFileHandle = FCREATE(tcDirectoryName + 'tm.tmp')
 
     IF pnFileHandle < 0 THEN
         RETURN .F.
@@ -78,8 +111,80 @@ FUNCTION _directory
 
     =FCLOSE(pnFileHandle)
 
-    DELETE FILE tcPath + 'tm.tmp'   
-* ENDFUNC
+    DELETE FILE tcDirectoryName + 'tm.tmp'   
+*ENDFUNC
+
+**/
+* Generates indexes on the 'codigo' and 'nombre' fields called 'indice1' and
+* 'indice2' respectively.
+*
+* @param string tcTableName
+* Specifies the name of the table on which indexes will be created (do not
+* include the file extension).
+*
+* @return boolean
+* _index returns true (.T.) if it can create the indexes; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION _index
+    PARAMETER tcTableName
+
+    * begin { parameter validations }
+    IF PARAMETERS() < 1 THEN
+        RETURN .F.
+    ENDIF
+
+    IF !table_exists(tcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    IF file_status(tcTableName + '.dbf') != 0 THEN
+        RETURN .F.
+    ENDIF
+    * end { parameter validations }
+
+    SELECT 0
+    USE (tcTableName) EXCLUSIVE
+    DELETE TAG ALL
+    INDEX ON codigo TAG 'indice1'
+    INDEX ON nombre TAG 'indice2'
+    USE
+*ENDFUNC
+
+**/
+* Generates tables with the fields 'codigo', 'nombre', 'vigente' and
+* 'id_local'.
+*
+* @param string tcTableName
+* Specifies the name of the table to create (do not include the file
+* extension).
+*
+* @return boolean
+* _table returns true (.T.) if it can create the table; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION _table
+    PARAMETER tcTableName
+
+    * begin { parameter validations }
+    IF PARAMETERS() < 1 THEN
+        RETURN .F.
+    ENDIF
+
+    IF table_exists(tcTableName) THEN
+        RETURN .F.
+    ENDIF
+    * end { parameter validations }
+
+    SELECT 0
+    CREATE TABLE (tcTableName) ( ;
+        codigo N(4), ;
+        nombre C(30), ;
+        vigente L(1), ;
+        id_local N(2) ;
+    )
+    USE
+*ENDFUNC
 
 **/
 * Returns the usage status of a file.
@@ -117,43 +222,82 @@ FUNCTION file_status
 *ENDFUNC
 
 **/
-* Generates indexes on the fields 'codigo' and 'nombre'
+* Determines whether the table already exists.
+*
+* @param string tcTableName
+* Specifies the name of the table to check (do not include the file extension).
 *
 * @return boolean
-* _index returns true (.T.) if it can create the indexes; otherwise,
-* it returns false (.F.).
+* table_exists returns true (.T.) if the table already exists; otherwise,
+* returns false (.F.).
 */
-FUNCTION _index
+FUNCTION table_exists
     PARAMETER tcTableName
 
     * begin { parameter validations }
+    IF PARAMETERS() < 1 THEN
+        RETURN .F.
+    ENDIF
+
     IF TYPE('tcTableName') != 'C' OR EMPTY(tcTableName) THEN
-        RETURN .F.
-    ENDIF
-
-    IF !FILE(tcTableName + '.dbf') THEN
-        RETURN .F.
-    ENDIF
-
-    IF file_status(tcTableName + '.dbf') != 0 THEN
         RETURN .F.
     ENDIF
     * end { parameter validations }
 
-    SELECT 0
-    USE (tcTableName) EXCLUSIVE
-    DELETE TAG ALL
-    INDEX ON codigo TAG 'indice1'
-    INDEX ON nombre TAG 'indice2'
+    IF !FILE(tcTableName + '.dbf') THEN
+        RETURN .F.
+    ENDIF
+*ENDFUNC
+
+**/ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+*                            DBF CREATION SECTION                            *
+* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+**/
+* depar_dbf() : boolean
+* familias_dbf() : boolean
+*/
+
+**/
+* Creates table 'depar'.
+*
+* @return boolean
+* depar_dbf returns true (.T.) if it can create the table; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION depar_dbf
+    PRIVATE pcTableName
+    pcTableName = 'depar'
+
+    IF table_exists(pcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    CREATE TABLE (pcTableName) ( ;
+        codigo N(3), ;
+        nombre C(30), ;
+        vigente L(1), ;
+        id_local N(2) ;
+    )
     USE
-* ENDFUNC
+*ENDFUNC
 
-**/ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
-*                          DBF CREATION SECTION                          *
-* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-
+**/
+* Creates table 'familias'.
+*
+* @return boolean
+* depar_dbf returns true (.T.) if it can create the table; otherwise, it
+* returns false (.F.).
+*/
 FUNCTION familias_dbf
-    CREATE TABLE familias ( ;
+    PRIVATE pcTableName
+    pcTableName = 'familias'
+
+    IF table_exists(pcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    CREATE TABLE (pcTableName) ( ;
         codigo N(4), ;
         nombre C(30), ;
         p1 N(6,2), ;
@@ -165,28 +309,8 @@ FUNCTION familias_dbf
         id_local N(2) ;
     )
     USE
-* ENDFUNC
+*ENDFUNC
 
-FUNCTION marcas1_dbf
-    CREATE TABLE marcas1 ( ;
-        codigo N(4), ;
-        nombre C(30), ;
-        vigente L(1), ;
-        id_local N(2) ;
-    )
-    USE
-* ENDFUNC
-
-FUNCTION marcas2_dbf
-    CREATE TABLE marcas2 ( ;
-        codigo N(4), ;
-        nombre C(30), ;
-        vigente L(1), ;
-        id_local N(2) ;
-    )
-    USE
-* ENDFUNC
-
-**/ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
-*                          CDX CREATION SECTION                          *
-* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+**/ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+*                            CDX CREATION SECTION                            *
+* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
