@@ -49,9 +49,10 @@ FUNCTION createdb
     SET DEFAULT TO (tcPath)
 
     * DBF.
+    DO _table('almacen')
     DO barrios_dbf
     DO ciudades_dbf
-    DO depar_dbf
+    DO _table('depar')
     DO familias_dbf
     DO maesprod_dbf
     DO _table('marcas1')
@@ -63,6 +64,7 @@ FUNCTION createdb
     DO unidad_dbf
 
     * CDX.
+    DO _index('almacen')
     DO _index('barrios')
     DO _index('ciudades')
     DO _index('depar')
@@ -189,12 +191,23 @@ FUNCTION _table
     * end { parameter validations }
 
     SELECT 0
-    CREATE TABLE (tcTableName) ( ;
-        codigo N(4), ;
-        nombre C(30), ;
-        vigente L(1), ;
-        id_local N(2) ;
-    )
+
+    IF INLIST(tcTableName, 'almacen', 'depar') THEN
+        CREATE TABLE (tcTableName) ( ;
+            codigo N(3), ;
+            nombre C(30), ;
+            vigente L(1), ;
+            id_local N(2) ;
+        )
+    ELSE
+        CREATE TABLE (tcTableName) ( ;
+            codigo N(4), ;
+            nombre C(30), ;
+            vigente L(1), ;
+            id_local N(2) ;
+        )
+    ENDIF
+
     USE
 *ENDFUNC
 
@@ -268,7 +281,6 @@ FUNCTION table_exists
 **/
 * barrios_dbf() : boolean
 * ciudades_dbf() : boolean
-* depar_dbf() : boolean
 * familias_dbf() : boolean
 * maesprod_dbf() : boolean
 * proveedo_dbf() : boolean
@@ -323,30 +335,6 @@ FUNCTION ciudades_dbf
         vigente L(1), ;
         id_local N(2), ;
         sifen N(5) ;
-    )
-    USE
-*ENDFUNC
-
-**/
-* Creates table 'depar'.
-*
-* @return boolean
-* depar_dbf returns true (.T.) if it can create the table; otherwise, it
-* returns false (.F.).
-*/
-FUNCTION depar_dbf
-    PRIVATE pcTableName
-    pcTableName = 'depar'
-
-    IF table_exists(pcTableName) THEN
-        RETURN .F.
-    ENDIF
-
-    CREATE TABLE (pcTableName) ( ;
-        codigo N(3), ;
-        nombre C(30), ;
-        vigente L(1), ;
-        id_local N(2) ;
     )
     USE
 *ENDFUNC
