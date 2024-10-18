@@ -51,6 +51,8 @@ FUNCTION createdb
     * DBF.
     DO accesos_dbf
     DO _table('almacen')
+    DO _table('aplicaci')
+    DO ausencia_dbf
     DO barrios_dbf
     DO ciudades_dbf
     DO _table('depar')
@@ -67,6 +69,7 @@ FUNCTION createdb
     * CDX.
     DO accesos_cdx
     DO _index('almacen')
+    DO _index('aplicaci')
     DO _index('barrios')
     DO _index('ciudades')
     DO _index('depar')
@@ -194,21 +197,28 @@ FUNCTION _table
 
     SELECT 0
 
-    IF INLIST(tcTableName, 'almacen', 'depar') THEN
+    DO CASE
+    CASE tcTableName == 'aplicaci'
+        CREATE TABLE (tcTableName) ( ;
+            codigo N(4), ;
+            nombre C(40), ;
+            vigente L(1) ;
+        )
+    CASE INLIST(tcTableName, 'almacen', 'depar')
         CREATE TABLE (tcTableName) ( ;
             codigo N(3), ;
             nombre C(30), ;
             vigente L(1), ;
             id_local N(2) ;
         )
-    ELSE
+    OTHERWISE
         CREATE TABLE (tcTableName) ( ;
             codigo N(4), ;
             nombre C(30), ;
             vigente L(1), ;
             id_local N(2) ;
         )
-    ENDIF
+    ENDCASE
 
     USE
 *ENDFUNC
@@ -282,6 +292,7 @@ FUNCTION table_exists
 
 **/
 * accesos_dbf() : boolean
+* ausencia_dbf() : boolean
 * barrios_dbf() : boolean
 * ciudades_dbf() : boolean
 * familias_dbf() : boolean
@@ -311,6 +322,32 @@ FUNCTION accesos_dbf
         hora_e C(8), ;
         fecha_s D(8), ;
         hora_s C(8) ;
+    )
+    USE
+*ENDFUNC
+
+**/
+* Creates table 'ausencia'.
+*
+* @return boolean
+* ausencia_dbf returns true (.T.) if it can create the table; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION ausencia_dbf
+    PRIVATE pcTableName
+    pcTableName = 'ausencia'
+
+    IF table_exists(pcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    CREATE TABLE (pcTableName) ( ;
+        empleado N(4), ;
+        fech_desde D(8), ;
+        fech_hasta D(8), ;
+        medio_dia L(1), ;
+        tipo N(1), ;
+        motivo C(50) ;
     )
     USE
 *ENDFUNC

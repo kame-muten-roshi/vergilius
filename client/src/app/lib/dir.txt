@@ -5,8 +5,8 @@
 
 16/08/2024  07:35               193 accesos.dbf     OK
 16/08/2024  07:35               310 almacen.dbf     OK
-02/11/2023  15:29               593 APLICACI.DBF
-25/08/2012  10:07               161 ausencia.dbf
+02/11/2023  15:29               593 APLICACI.DBF    OK
+25/08/2012  10:07               161 ausencia.dbf    OK
 29/06/2009  22:58            15.355 ayuda.dbf
 24/08/2024  12:30             1.850 BANCO.DBF
 16/08/2024  07:35             1.589 barrios.dbf
