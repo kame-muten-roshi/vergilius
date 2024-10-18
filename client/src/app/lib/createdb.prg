@@ -53,6 +53,7 @@ FUNCTION createdb
     DO ciudades_dbf
     DO depar_dbf
     DO familias_dbf
+    DO maesprod_dbf
     DO _table('marcas1')
     DO _table('marcas2')
     DO _table('proceden')
@@ -66,6 +67,7 @@ FUNCTION createdb
     DO _index('ciudades')
     DO _index('depar')
     DO _index('familias')
+    DO maesprod_cdx
     DO _index('marcas1')
     DO _index('marcas2')
     DO _index('proceden')
@@ -268,6 +270,7 @@ FUNCTION table_exists
 * ciudades_dbf() : boolean
 * depar_dbf() : boolean
 * familias_dbf() : boolean
+* maesprod_dbf() : boolean
 * proveedo_dbf() : boolean
 * unidad_dbf() : boolean
 */
@@ -378,6 +381,86 @@ FUNCTION familias_dbf
 *ENDFUNC
 
 **/
+* Creates table 'maesprod'.
+*
+* @return boolean
+* maesprod_dbf returns true (.T.) if it can create the table; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION maesprod_dbf
+    PRIVATE pcTableName
+    pcTableName = 'maesprod'
+
+    IF table_exists(pcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    CREATE TABLE (pcTableName) ( ;
+        codigo C(15), ;
+        codigo2 C(15), ;
+        codorig C(15), ;
+        nombre C(40), ;
+        aplicacion M(10), ;
+        lista3 L(1), ;
+        lista4 L(1), ;
+        lista5 L(1), ;
+        familia N(4), ;
+        rubro N(4), ;
+        subrubro N(4), ;
+        marca N(4), ;
+        unidad N(3), ;
+        proveedor N(5), ;
+        procedenci N(4), ;
+        ubicacion C(37), ;
+        vigente L(1), ;
+        lprecio L(1), ;
+        impuesto L(1), ;
+        pimpuesto N(6,2), ;
+        pcostog N(13,4), ;
+        pcostog2 N(13,4), ;
+        pcostod N(13,4), ;
+        pcostogr N(13,4), ;
+        pcostodr N(13,4), ;
+        pcostogre N(13,4), ;
+        pcostodre N(13,4), ;
+        pventag1 N(13,4), ;
+        pventag2 N(13,4), ;
+        pventag3 N(13,4), ;
+        pventag4 N(13,4), ;
+        pventag5 N(13,4), ;
+        pventad1 N(13,4), ;
+        pventad2 N(13,4), ;
+        pventad3 N(13,4), ;
+        pventad4 N(13,4), ;
+        pventad5 N(13,4), ;
+        updprices L(1), ;
+        paumento1 N(6,2), ;
+        paumento2 N(6,2), ;
+        paumento3 N(6,2), ;
+        paumento4 N(6,2), ;
+        paumento5 N(6,2), ;
+        stock_min N(11,2), ;
+        stock_max N(11,2), ;
+        polinvsmin L(1), ;
+        polinvsmax L(1), ;
+        garantia C(20), ;
+        caracter1 C(60), ;
+        caracter2 C(60), ;
+        caracter3 C(60), ;
+        otros1 C(60), ;
+        otros2 C(60), ;
+        fecucompra D(8), ;
+        fecrepo D(8), ;
+        stock_actu N(11,2), ;
+        stock_ot N(11,2), ;
+        id_local N(2), ;
+        stock_excl L(1), ;
+        id_product C(20) ;
+    )
+    USE
+*ENDFUNC
+
+**/
 * Creates table 'proveedo'.
 *
 * @return boolean
@@ -468,3 +551,46 @@ FUNCTION unidad_dbf
 **/ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
 *                            CDX CREATION SECTION                            *
 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+**/
+* maesprod_cdx() : boolean
+*/
+
+**/
+* Creates the indexes for the 'maesprod' table.
+*
+* @return boolean
+* maesprod_cdx returns true (.T.) if it can create the indexes; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION maesprod_cdx
+    PRIVATE pcTableName
+    pcTableName = 'maesprod'
+
+    IF !table_exists(pcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    IF file_status(pcTableName + '.dbf') != 0 THEN
+        RETURN .F.
+    ENDIF
+
+    SELECT 0
+    USE (pcTableName) EXCLUSIVE
+    DELETE TAG ALL
+    INDEX ON codigo TAG 'indice1'
+    INDEX ON nombre TAG 'indice2'
+    INDEX ON rubro TAG 'indice3'
+    INDEX ON subrubro TAG 'indice4'
+    INDEX ON marca TAG 'indice5'
+    INDEX ON codigo2 TAG 'indice6'
+    INDEX ON codorig TAG 'indice7'
+    INDEX ON VAL(codigo) TAG 'indice8'
+    INDEX ON familia TAG 'indice9'
+    INDEX ON nombre TAG 'indice10' FOR vigente
+    INDEX ON codigo TAG 'indice11' FOR vigente
+    INDEX ON codigo2 TAG 'indice12' FOR vigente
+    INDEX ON codorig TAG 'indice13' FOR vigente
+    INDEX ON ubicacion TAG 'indice14'
+    USE
+*ENDFUNC
