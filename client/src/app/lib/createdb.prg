@@ -49,6 +49,7 @@ FUNCTION createdb
     SET DEFAULT TO (tcPath)
 
     * DBF.
+    DO accesos_dbf
     DO _table('almacen')
     DO barrios_dbf
     DO ciudades_dbf
@@ -64,6 +65,7 @@ FUNCTION createdb
     DO unidad_dbf
 
     * CDX.
+    DO accesos_cdx
     DO _index('almacen')
     DO _index('barrios')
     DO _index('ciudades')
@@ -279,6 +281,7 @@ FUNCTION table_exists
 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 **/
+* accesos_dbf() : boolean
 * barrios_dbf() : boolean
 * ciudades_dbf() : boolean
 * familias_dbf() : boolean
@@ -286,6 +289,31 @@ FUNCTION table_exists
 * proveedo_dbf() : boolean
 * unidad_dbf() : boolean
 */
+
+**/
+* Creates table 'accesos'.
+*
+* @return boolean
+* accesos_dbf returns true (.T.) if it can create the table; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION accesos_dbf
+    PRIVATE pcTableName
+    pcTableName = 'accesos'
+
+    IF table_exists(pcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    CREATE TABLE (pcTableName) ( ;
+        usuario N(4), ;
+        fecha_e D(8), ;
+        hora_e C(8), ;
+        fecha_s D(8), ;
+        hora_s C(8) ;
+    )
+    USE
+*ENDFUNC
 
 **/
 * Creates table 'barrios'.
@@ -541,8 +569,35 @@ FUNCTION unidad_dbf
 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 **/
+* accesos_cdx() : boolean
 * maesprod_cdx() : boolean
 */
+
+**/
+* Creates the indexes for the 'accesos' table.
+*
+* @return boolean
+* accesos_cdx returns true (.T.) if it can create the indexes; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION accesos_cdx
+    PRIVATE pcTableName
+    pcTableName = 'accesos'
+
+    IF !table_exists(pcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    IF file_status(pcTableName + '.dbf') != 0 THEN
+        RETURN .F.
+    ENDIF
+
+    SELECT 0
+    USE (pcTableName) EXCLUSIVE
+    DELETE TAG ALL
+    INDEX ON usuario TAG 'indice1'
+    USE
+*ENDFUNC
 
 **/
 * Creates the indexes for the 'maesprod' table.

@@ -3,7 +3,7 @@
 
  Directorio de Z:\turtle\aya\integrad.000
 
-16/08/2024  07:35               193 accesos.dbf
+16/08/2024  07:35               193 accesos.dbf     OK
 16/08/2024  07:35               310 almacen.dbf     OK
 02/11/2023  15:29               593 APLICACI.DBF
 25/08/2012  10:07               161 ausencia.dbf
