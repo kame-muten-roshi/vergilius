@@ -53,6 +53,7 @@ FUNCTION createdb
     DO _table('almacen')
     DO _table('aplicaci')
     DO ausencia_dbf
+    DO banco_dbf
     DO barrios_dbf
     DO ciudades_dbf
     DO _table('depar')
@@ -70,6 +71,7 @@ FUNCTION createdb
     DO accesos_cdx
     DO _index('almacen')
     DO _index('aplicaci')
+    DO banco_cdx
     DO _index('barrios')
     DO _index('ciudades')
     DO _index('depar')
@@ -292,6 +294,7 @@ FUNCTION table_exists
 
 **/
 * accesos_dbf() : boolean
+* banco_dbf() : boolean
 * ausencia_dbf() : boolean
 * barrios_dbf() : boolean
 * ciudades_dbf() : boolean
@@ -348,6 +351,31 @@ FUNCTION ausencia_dbf
         medio_dia L(1), ;
         tipo N(1), ;
         motivo C(50) ;
+    )
+    USE
+*ENDFUNC
+
+**/
+* Creates table 'banco'.
+*
+* @return boolean
+* banco_dbf returns true (.T.) if it can create the table; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION banco_dbf
+    PRIVATE pcTableName
+    pcTableName = 'banco'
+
+    IF table_exists(pcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    CREATE TABLE (pcTableName) ( ;
+        codigo N(3), ;
+        nombre C(62), ;
+        abreviado C(10), ;
+        ruc C(15), ;
+        vigente L(1) ;
     )
     USE
 *ENDFUNC
@@ -607,6 +635,7 @@ FUNCTION unidad_dbf
 
 **/
 * accesos_cdx() : boolean
+* banco_cdx() : boolean
 * maesprod_cdx() : boolean
 */
 
@@ -633,6 +662,34 @@ FUNCTION accesos_cdx
     USE (pcTableName) EXCLUSIVE
     DELETE TAG ALL
     INDEX ON usuario TAG 'indice1'
+    USE
+*ENDFUNC
+
+**/
+* Creates the indexes for the 'banco' table.
+*
+* @return boolean
+* banco_cdx returns true (.T.) if it can create the indexes; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION banco_cdx
+    PRIVATE pcTableName
+    pcTableName = 'banco'
+
+    IF !table_exists(pcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    IF file_status(pcTableName + '.dbf') != 0 THEN
+        RETURN .F.
+    ENDIF
+
+    SELECT 0
+    USE (pcTableName) EXCLUSIVE
+    DELETE TAG ALL
+    INDEX ON codigo TAG 'indice1'
+    INDEX ON nombre TAG 'indice2'
+    INDEX ON ruc TAG 'indice3'
     USE
 *ENDFUNC
 
