@@ -55,6 +55,7 @@ FUNCTION createdb
     DO ausencia_dbf
     DO banco_dbf
     DO barrios_dbf
+    DO cabecob_dbf
     DO ciudades_dbf
     DO _table('depar')
     DO familias_dbf
@@ -73,6 +74,7 @@ FUNCTION createdb
     DO _index('aplicaci')
     DO banco_cdx
     DO _index('barrios')
+    DO cabecob_cdx
     DO _index('ciudades')
     DO _index('depar')
     DO _index('familias')
@@ -297,6 +299,7 @@ FUNCTION table_exists
 * banco_dbf() : boolean
 * ausencia_dbf() : boolean
 * barrios_dbf() : boolean
+* cabecob_dbf() : boolean
 * ciudades_dbf() : boolean
 * familias_dbf() : boolean
 * maesprod_dbf() : boolean
@@ -402,6 +405,39 @@ FUNCTION barrios_dbf
         ciudad N(5), ;
         vigente L(1), ;
         id_local N(2) ;
+    )
+    USE
+*ENDFUNC
+
+**/
+* Creates table 'cabecob'.
+*
+* @return boolean
+* cabecob_dbf returns true (.T.) if it can create the table; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION cabecob_dbf
+    PRIVATE pcTableName
+    pcTableName = 'cabecob'
+
+    IF table_exists(pcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    CREATE TABLE (pcTableName) ( ;
+        tiporeci N(1), ;
+        nroreci N(7), ;
+        fechareci D(8), ;
+        id_local N(2), ;
+        moneda N(4), ;
+        tipocambio N(9,2), ;
+        factura C(1), ;
+        cliente N(7), ;
+        cobrador N(3), ;
+        comision N(6,2), ;
+        monto_cobr N(12,2), ;
+        fechaanu D(8), ;
+        anulado L(1) ;
     )
     USE
 *ENDFUNC
@@ -636,6 +672,7 @@ FUNCTION unidad_dbf
 **/
 * accesos_cdx() : boolean
 * banco_cdx() : boolean
+* cabecob_cdx() : boolean
 * maesprod_cdx() : boolean
 */
 
@@ -690,6 +727,34 @@ FUNCTION banco_cdx
     INDEX ON codigo TAG 'indice1'
     INDEX ON nombre TAG 'indice2'
     INDEX ON ruc TAG 'indice3'
+    USE
+*ENDFUNC
+
+**/
+* Creates the indexes for the 'cabecob' table.
+*
+* @return boolean
+* cabecob_cdx returns true (.T.) if it can create the indexes; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION cabecob_cdx
+    PRIVATE pcTableName
+    pcTableName = 'cabecob'
+
+    IF !table_exists(pcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    IF file_status(pcTableName + '.dbf') != 0 THEN
+        RETURN .F.
+    ENDIF
+
+    SELECT 0
+    USE (pcTableName) EXCLUSIVE
+    DELETE TAG ALL
+    INDEX ON STR(tiporeci, 1) + STR(nroreci, 7) TAG 'indice1'
+    INDEX ON DTOS(fechareci) TAG 'indice2'
+    INDEX ON cliente TAG 'indice3'
     USE
 *ENDFUNC
 
