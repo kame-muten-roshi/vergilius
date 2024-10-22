@@ -56,6 +56,7 @@ FUNCTION createdb
     DO banco_dbf
     DO barrios_dbf
     DO cabecob_dbf
+    DO cabecomp_dbf
     DO ciudades_dbf
     DO _table('depar')
     DO familias_dbf
@@ -75,6 +76,7 @@ FUNCTION createdb
     DO banco_cdx
     DO _index('barrios')
     DO cabecob_cdx
+    DO cabecomp_cdx
     DO _index('ciudades')
     DO _index('depar')
     DO _index('familias')
@@ -300,6 +302,7 @@ FUNCTION table_exists
 * ausencia_dbf() : boolean
 * barrios_dbf() : boolean
 * cabecob_dbf() : boolean
+* cabecomp_dbf() : boolean
 * ciudades_dbf() : boolean
 * familias_dbf() : boolean
 * maesprod_dbf() : boolean
@@ -438,6 +441,42 @@ FUNCTION cabecob_dbf
         monto_cobr N(12,2), ;
         fechaanu D(8), ;
         anulado L(1) ;
+    )
+    USE
+*ENDFUNC
+
+**/
+* Creates table 'cabecomp'.
+*
+* @return boolean
+* cabecomp_dbf returns true (.T.) if it can create the table; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION cabecomp_dbf
+    PRIVATE pcTableName
+    pcTableName = 'cabecomp'
+
+    IF table_exists(pcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    CREATE TABLE (pcTableName) ( ;
+        tipodocu N(1), ;
+        nrodocu N(9), ;
+        fechadocu D(8), ;
+        proveedor N(5), ;
+        moneda N(4), ;
+        tipocambio N(9,2), ;
+        qty_cuotas N(3), ;
+        porcdesc N(8,4), ;
+        importdesc N(12,3), ;
+        descuento N(8,4), ;
+        monto_fact N(12,2), ;
+        monto_ndeb N(12,2), ;
+        monto_ncre N(12,2), ;
+        monto_pago N(12,2), ;
+        consignaci L(1), ;
+        id_local N(2) ;
     )
     USE
 *ENDFUNC
@@ -673,6 +712,7 @@ FUNCTION unidad_dbf
 * accesos_cdx() : boolean
 * banco_cdx() : boolean
 * cabecob_cdx() : boolean
+* cabecomp_cdx() : boolean
 * maesprod_cdx() : boolean
 */
 
@@ -755,6 +795,34 @@ FUNCTION cabecob_cdx
     INDEX ON STR(tiporeci, 1) + STR(nroreci, 7) TAG 'indice1'
     INDEX ON DTOS(fechareci) TAG 'indice2'
     INDEX ON cliente TAG 'indice3'
+    USE
+*ENDFUNC
+
+**/
+* Creates the indexes for the 'cabecomp' table.
+*
+* @return boolean
+* cabecomp_cdx returns true (.T.) if it can create the indexes; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION cabecomp_cdx
+    PRIVATE pcTableName
+    pcTableName = 'cabecomp'
+
+    IF !table_exists(pcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    IF file_status(pcTableName + '.dbf') != 0 THEN
+        RETURN .F.
+    ENDIF
+
+    SELECT 0
+    USE (pcTableName) EXCLUSIVE
+    DELETE TAG ALL
+    INDEX ON STR(tipodocu, 1) + STR(nrodocu, 9) + STR(proveedor, 5) + DTOS(fechadocu) TAG 'indice1'
+    INDEX ON DTOS(fechadocu) + STR(proveedor, 5) + STR(tipodocu, 1) + STR(nrodocu, 9) TAG 'indice2'
+    INDEX ON STR(proveedor, 5) + DTOS(fechadocu) + STR(tipodocu, 1) + STR(nrodocu, 9) TAG 'indice3'
     USE
 *ENDFUNC
 
