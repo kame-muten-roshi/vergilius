@@ -13,7 +13,7 @@
 16/08/2024  07:35             1.589 barrios.dbf     OK
 17/10/2024  15:14         2.132.160 CABECOB.DBF     OK
 18/10/2024  06:34         2.939.965 CABECOMP.DBF    OK
-02/11/2023  15:29               468 CABEDESC.DBF    
+02/11/2023  15:29               468 CABEDESC.DBF    OK
 24/09/2013  17:06             3.189 cabefluj.DBF
 16/08/2024  07:35               545 cabeimpo.dbf
 17/10/2024  15:43         6.350.832 CABEMOT.DBF

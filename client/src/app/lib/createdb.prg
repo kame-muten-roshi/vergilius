@@ -57,6 +57,7 @@ FUNCTION createdb
     DO barrios_dbf
     DO cabecob_dbf
     DO cabecomp_dbf
+    DO cabedesc_dbf
     DO ciudades_dbf
     DO _table('depar')
     DO familias_dbf
@@ -303,6 +304,7 @@ FUNCTION table_exists
 * barrios_dbf() : boolean
 * cabecob_dbf() : boolean
 * cabecomp_dbf() : boolean
+* cabedesc_dbf() : boolean
 * ciudades_dbf() : boolean
 * familias_dbf() : boolean
 * maesprod_dbf() : boolean
@@ -477,6 +479,34 @@ FUNCTION cabecomp_dbf
         monto_pago N(12,2), ;
         consignaci L(1), ;
         id_local N(2) ;
+    )
+    USE
+*ENDFUNC
+
+**/
+* Creates table 'cabedesc'.
+*
+* @return boolean
+* cabedesc_dbf returns true (.T.) if it can create the table; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION cabedesc_dbf
+    PRIVATE pcTableName
+    pcTableName = 'cabedesc'
+
+    IF table_exists(pcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    CREATE TABLE (pcTableName) ( ;
+        id_desc N(10), ;
+        nombre C(40), ;
+        lista N(1), ;
+        porcdesc N(8,4), ;
+        cantidad N(5), ;
+        fec_inicio D(8), ;
+        fec_fin D(8), ;
+        fec_alta D(8) ;
     )
     USE
 *ENDFUNC
