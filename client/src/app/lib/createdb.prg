@@ -58,6 +58,7 @@ FUNCTION createdb
     DO cabecob_dbf
     DO cabecomp_dbf
     DO cabedesc_dbf
+    DO cabefluj_dbf
     DO ciudades_dbf
     DO _table('depar')
     DO familias_dbf
@@ -507,6 +508,34 @@ FUNCTION cabedesc_dbf
         fec_inicio D(8), ;
         fec_fin D(8), ;
         fec_alta D(8) ;
+    )
+    USE
+*ENDFUNC
+
+**/
+* Creates table 'cabefluj'.
+*
+* @return boolean
+* cabefluj_dbf returns true (.T.) if it can create the table; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION cabefluj_dbf
+    PRIVATE pcTableName
+    pcTableName = 'cabefluj'
+
+    IF table_exists(pcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    CREATE TABLE (pcTableName) ( ;
+        codigo I(4), ;
+        orden V(5), ;
+        nombre V(100), ;
+        imputable C(1), ;
+        desde V(5), ;
+        hasta V(5), ;
+        signo C(1), ;
+        tot_subgru C(1) ;
     )
     USE
 *ENDFUNC
