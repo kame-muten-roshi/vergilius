@@ -59,6 +59,7 @@ FUNCTION createdb
     DO cabecomp_dbf
     DO cabedesc_dbf
     DO cabefluj_dbf
+    DO cabeimpo_dbf
     DO ciudades_dbf
     DO _table('depar')
     DO familias_dbf
@@ -79,6 +80,7 @@ FUNCTION createdb
     DO _index('barrios')
     DO cabecob_cdx
     DO cabecomp_cdx
+    DO cabeimpo_cdx
     DO _index('ciudades')
     DO _index('depar')
     DO _index('familias')
@@ -306,6 +308,8 @@ FUNCTION table_exists
 * cabecob_dbf() : boolean
 * cabecomp_dbf() : boolean
 * cabedesc_dbf() : boolean
+* cabefluj_dbf() : boolean
+* cabeimpo_dbf() : boolean
 * ciudades_dbf() : boolean
 * familias_dbf() : boolean
 * maesprod_dbf() : boolean
@@ -536,6 +540,42 @@ FUNCTION cabefluj_dbf
         hasta V(5), ;
         signo C(1), ;
         tot_subgru C(1) ;
+    )
+    USE
+*ENDFUNC
+
+**/
+* Creates table 'cabeimpo'.
+*
+* @return boolean
+* cabeimpo_dbf returns true (.T.) if it can create the table; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION cabeimpo_dbf
+    PRIVATE pcTableName
+    pcTableName = 'cabeimpo'
+
+    IF table_exists(pcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    CREATE TABLE (pcTableName) ( ;
+        tipodocu C(1), ;
+        nrodocu C(15), ;
+        proveedor N(5), ;
+        fechadocu D(8), ;
+        divisa N(4), ;
+        decimales N(2), ;
+        cambio_adu N(11,4), ;
+        cambio_gto N(11,4), ;
+        cambio_vta N(11,4), ;
+        almacen N(4), ;
+        porcdesc N(8,4), ;
+        importdesc N(12,2), ;
+        descuento N(8,4), ;
+        monto_gast N(12,2), ;
+        monto_fact N(12,2), ;
+        monto_pago N(12,2) ;
     )
     USE
 *ENDFUNC
@@ -772,6 +812,7 @@ FUNCTION unidad_dbf
 * banco_cdx() : boolean
 * cabecob_cdx() : boolean
 * cabecomp_cdx() : boolean
+* cabeimpo_cdx() : boolean
 * maesprod_cdx() : boolean
 */
 
@@ -882,6 +923,34 @@ FUNCTION cabecomp_cdx
     INDEX ON STR(tipodocu, 1) + STR(nrodocu, 9) + STR(proveedor, 5) + DTOS(fechadocu) TAG 'indice1'
     INDEX ON DTOS(fechadocu) + STR(proveedor, 5) + STR(tipodocu, 1) + STR(nrodocu, 9) TAG 'indice2'
     INDEX ON STR(proveedor, 5) + DTOS(fechadocu) + STR(tipodocu, 1) + STR(nrodocu, 9) TAG 'indice3'
+    USE
+*ENDFUNC
+
+**/
+* Creates the indexes for the 'cabeimpo' table.
+*
+* @return boolean
+* cabeimpo_cdx returns true (.T.) if it can create the indexes; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION cabeimpo_cdx
+    PRIVATE pcTableName
+    pcTableName = 'cabeimpo'
+
+    IF !table_exists(pcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    IF file_status(pcTableName + '.dbf') != 0 THEN
+        RETURN .F.
+    ENDIF
+
+    SELECT 0
+    USE (pcTableName) EXCLUSIVE
+    DELETE TAG ALL
+    INDEX ON tipodocu + nrodocu + STR(proveedor, 5) TAG 'indice1'
+    INDEX ON DTOS(fechadocu) + STR(proveedor, 5) + tipodocu + nrodocu TAG 'indice2'
+    INDEX ON STR(proveedor, 5) + DTOS(fechadocu) + tipodocu + nrodocu TAG 'indice3'
     USE
 *ENDFUNC
 
