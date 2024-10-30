@@ -60,6 +60,7 @@ FUNCTION createdb
     DO cabedesc_dbf
     DO cabefluj_dbf
     DO cabeimpo_dbf
+    DO cabemot_dbf
     DO ciudades_dbf
     DO _table('depar')
     DO familias_dbf
@@ -310,6 +311,7 @@ FUNCTION table_exists
 * cabedesc_dbf() : boolean
 * cabefluj_dbf() : boolean
 * cabeimpo_dbf() : boolean
+* cabemot_dbf() : boolean
 * ciudades_dbf() : boolean
 * familias_dbf() : boolean
 * maesprod_dbf() : boolean
@@ -581,6 +583,45 @@ FUNCTION cabeimpo_dbf
 *ENDFUNC
 
 **/
+* Creates table 'cabemot'.
+*
+* @return boolean
+* cabemot_dbf returns true (.T.) if it can create the table; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION cabemot_dbf
+    PRIVATE pcTableName
+    pcTableName = 'cabemot'
+
+    IF table_exists(pcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    CREATE TABLE (pcTableName) ( ;
+        tipobole N(1), ;
+        serie C(1), ;
+        nrobole N(7), ;
+        fecha D(8), ;
+        lstprecio N(1), ;
+        almacen N(3), ;
+        moneda N(4), ;
+        tipocambio N(9,2), ;
+        vendedor N(3), ;
+        comision_1 N(6,2), ;
+        comision_2 N(6,2), ;
+        comision_3 N(6,2), ;
+        obs1 C(45), ;
+        obs2 C(45), ;
+        obs3 C(45), ;
+        porcdesc N(8,4), ;
+        importdesc N(12,2), ;
+        descuento N(8,4), ;
+        monto_fact N(12,2) ;
+    )
+    USE
+*ENDFUNC
+
+**/
 * Creates table 'ciudades'.
 *
 * @return boolean
@@ -813,6 +854,7 @@ FUNCTION unidad_dbf
 * cabecob_cdx() : boolean
 * cabecomp_cdx() : boolean
 * cabeimpo_cdx() : boolean
+* cabemot_cdx() : boolean
 * maesprod_cdx() : boolean
 */
 
@@ -951,6 +993,34 @@ FUNCTION cabeimpo_cdx
     INDEX ON tipodocu + nrodocu + STR(proveedor, 5) TAG 'indice1'
     INDEX ON DTOS(fechadocu) + STR(proveedor, 5) + tipodocu + nrodocu TAG 'indice2'
     INDEX ON STR(proveedor, 5) + DTOS(fechadocu) + tipodocu + nrodocu TAG 'indice3'
+    USE
+*ENDFUNC
+
+**/
+* Creates the indexes for the 'cabemot' table.
+*
+* @return boolean
+* cabemot_cdx returns true (.T.) if it can create the indexes; otherwise, it
+* returns false (.F.).
+*/
+FUNCTION cabemot_cdx
+    PRIVATE pcTableName
+    pcTableName = 'cabemot'
+
+    IF !table_exists(pcTableName) THEN
+        RETURN .F.
+    ENDIF
+
+    IF file_status(pcTableName + '.dbf') != 0 THEN
+        RETURN .F.
+    ENDIF
+
+    SELECT 0
+    USE (pcTableName) EXCLUSIVE
+    DELETE TAG ALL
+    INDEX ON STR(tipobole, 1) + serie + STR(nrobole, 7) TAG 'indice1'
+    INDEX ON DTOS(fecha) + STR(tipobole, 1) + serie + STR(nrobole, 7) TAG 'indice2'
+    INDEX ON STR(tipobole, 1) + serie + STR(nrobole, 7) + DTOS(fecha) TAG 'indice3'
     USE
 *ENDFUNC
 
